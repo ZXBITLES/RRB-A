@@ -1,0 +1,357 @@
+﻿#include "Graphic.zxbas"
+
+const actionEmpty as ubyte = 0
+const actionR as ubyte = 1
+const actionL as ubyte = 2
+const actionU as ubyte = 3
+const actionD as ubyte = 4
+const actionF as ubyte = 5
+const actionX as ubyte = 6
+
+const directionR as ubyte = 0
+const directionL as ubyte = 1
+const directionRS as ubyte = 2
+const directionLS as ubyte = 3
+const directionLF as ubyte = 4
+const directionRF as ubyte = 5
+const directionRX as ubyte = 6
+const directionLX as ubyte = 7
+const directionRD as ubyte = 8
+const directionLD as ubyte = 9
+const directionRS1 as ubyte = 10
+const directionLS1 as ubyte = 11
+const directionRS2 as ubyte = 12
+const directionLS2 as ubyte = 13
+const directionEmpty as ubyte = 14
+const directionRK as ubyte = 15
+const directionLK as ubyte = 16
+'const directionRU as ubyte = 17
+'const directionLU as ubyte = 18
+
+dim sprite1 as string
+dim sprite2 as string
+
+sub ClearBeforeDeathInLava(x as ubyte, y as ubyte, mode as ubyte)
+	RedrawArea1(x-1,y): RedrawArea1(x+1,y)
+	RedrawArea1(x-1,y+1): RedrawArea1(x+1,y+1)
+	if mode = 1 then
+		RedrawArea1(x,y)
+		RedrawArea1(x,y+1)
+	end if 
+end sub 
+
+sub DrawDeathInLava(x as ubyte, y as ubyte, callclear as ubyte)
+	if callclear=1 then ClearBeforeDeathInLava(x,y,1)
+	DeathInLava()
+	paper 0
+	dim i as ubyte 
+	dim k as ubyte
+	k=1
+	for i=0 to 12
+		ink k
+		if i = 0 or i = 1 then print at y+1,x; "\A"
+		if i = 2 or i = 3 then print at y+1,x; "\B"
+		if i = 4 or i = 5 then print at y+1,x; "\C"
+		if i = 6 or i = 7 then print at y+1,x; "\D"
+		if i = 8 or i = 9 then print at y+1,x; "\E"
+		if i = 10 or i = 11 then print at y+1,x; "\F"
+		if i=12 and callclear=0 then print at y+1,x; " "
+		pause 3
+		if k = 1 then 
+			k = 5
+		else
+			k = 1
+		end if 
+	next
+	if callclear=1 then ClearBeforeDeathInLava(x,y,1)
+end sub
+
+Sub DrawPlayer(direction as ubyte, frame as ubyte, x as ubyte, y as ubyte, color as ubyte)
+	ink color
+	paper 0
+
+	if direction = directionR then
+		PlayerWalkRight()
+		if frame = 1 then
+			sprite1="\A\B"
+			sprite2="\C\D"
+		end if
+		if frame = 2 then
+			sprite1="\E\F"
+			sprite2="\G\H"
+		end if
+		if frame = 3 then
+			sprite1="\I\J"
+			sprite2="\K\L"
+			'StepSound3()
+		end if
+		if frame = 4 then
+			sprite1="\M\N"
+			sprite2="\O\P"
+		end if
+		if frame = 5 then
+			sprite1="\Q\R"
+			sprite2="\S\T"	
+			'StepSound4()			
+		end if
+		print at y,x; sprite1
+		print at y+1,x; sprite2
+	end if
+	
+	if direction = directionRS or direction = directionRD or direction = directionRF then PlayerStaticRight()
+	if direction = directionRS then		
+		print at y,x; "\A"
+		print at y+1,x; "\B"
+	end if
+	
+	if direction = directionRD then
+		print at y,x; "\C"
+		print at y+1,x; "\D"
+	end if
+	
+	if direction = directionRF then
+		if frame=1 then
+			sprite1="\E\F"
+			sprite2="\G"
+		end if
+		if frame=2 then
+			sprite1="\E\H"
+			sprite2="\G"
+		end if
+		if frame=3 then
+			sprite1="\E\I"
+			sprite2="\G"
+		end if
+		if frame=4 then
+			sprite1="\E\J"
+			sprite2="\G"
+		end if
+		print at y,x; sprite1
+		print at y+1,x; sprite2
+		REM if frame=5 then
+			REM print at y,x; "\E\K"
+			REM print at y+1,x; "\G\L"
+		REM end if
+	end if
+	
+	if direction = directionRK or direction = directionLK then ClearBeforeDeathInLava(x,y,0): PlayerKick()
+	if direction = directionRK then
+		if frame=1 or frame=2 then
+			sprite1="\D\E"
+			sprite2="\F"
+		end if 
+		if frame>=3 and frame<=5 then
+			sprite1="\D\I"
+			sprite2="\F\J"
+		end if 
+		print at y,x; sprite1
+		print at y+1,x; sprite2
+	end if 
+	
+	if direction = directionLK then
+		if frame=1 or frame=2 then
+			sprite1="\A\B"
+			sprite2=" \C"
+		end if 
+		if frame>=3 and frame<=5 then
+			sprite1="\G\B"
+			sprite2="\H\C"
+		end if 
+		print at y,x-1; sprite1
+		print at y+1,x-1; sprite2
+	end if 
+
+
+	'if direction = directionRU or direction = directionLU then ClearBeforeDeathInLava(x,y,0): PlayerUppercut()
+	'if direction = directionRU then
+	''	if frame=1 or frame=2 then
+	''		sprite1="\E\F"
+	''		sprite2="\G\H"
+	''	end if 
+	''	if frame>=3 and frame<=5 then
+	''		sprite1="\L\M"
+	''		sprite2="\N"
+	''	end if 
+	''	print at y,x; sprite1
+	''	print at y+1,x; sprite2
+	'end if 
+	
+	'if direction = directionLU then
+	''	if frame=1 or frame=2 then
+	''		sprite1="\A\B"
+	''		sprite2="\C\D"
+	''	end if 
+	''	if frame>=3 and frame<=5 then
+	''		sprite1="\I\J"
+	''		sprite2=" \K"
+	''	end if 
+	''	print at y,x-1; sprite1
+	''	print at y+1,x-1; sprite2
+	'end if 
+	
+	if direction = directionL then
+		PlayerWalkLeft()
+		if frame = 1 then
+			sprite1="\A\B"
+			sprite2="\C\D"
+		end if
+		if frame = 2 then
+			sprite1="\E\F"
+			sprite2="\G\H"
+		end if
+		if frame = 3 then
+			sprite1="\I\J"
+			sprite2="\K\L"
+			'StepSound3()			
+		end if
+		if frame = 4 then
+			sprite1="\M\N"
+			sprite2="\O\P"			
+		end if
+		if frame = 5 then
+			sprite1="\Q\R"
+			sprite2="\S\T"
+			'StepSound4()
+		end if
+		print at y,x-1; sprite1
+		print at y+1,x-1; sprite2
+	end if
+	
+	if direction = directionLS or direction = directionLD or direction = directionLF then PlayerStaticLeft()
+	if direction = directionLS then
+		print at y,x; "\A"
+		print at y+1,x; "\B"
+	end if
+	
+	if direction = directionLD then
+		print at y,x; "\D"
+		print at y+1,x; "\F"
+	end if
+	
+	if direction = directionLF then
+		if frame=1 then
+			sprite1="\G\H"
+			sprite2="\I"
+		end if
+		if frame=2 then
+			sprite1="\J\H"
+			sprite2="\I"
+		end if
+		if frame=3 then
+			sprite1="\K\H"
+			sprite2="\I"
+		end if
+		if frame=4 then
+			sprite1="\L\H"
+			sprite2="\I"
+		end if
+		REM if frame=5 then
+			REM print at y,x-1; "\M\H"
+			REM print at y+1,x-1; "\N\I"
+		REM end if
+		print at y,x-1; sprite1
+		print at y+1,x; sprite2
+	end if
+
+	if direction = directionLX or direction = directionRX then
+		if direction = directionLX then PlayerFallingLeft()
+		if direction = directionRX then PlayerFallingRight()
+		if frame=1 then
+			sprite1="\A\B"
+			sprite2="\C\D"
+		end if
+		if frame=2 then
+			sprite1="\E\F"
+			sprite2="\G\H"
+		end if
+		if frame=3 then
+			sprite1="\I\J"
+			sprite2="\K\L"
+		end if
+		if frame=4 then
+			sprite1="\M\N"
+			sprite2="\O\P"
+		end if
+		if frame=5 then
+			sprite2="\Q\R"
+		end if
+		if frame<5 then
+			print at y,x; sprite1
+			print at y+1,x; sprite2
+		else
+			print at y+1,x; sprite2
+		end if
+	end if
+
+	if direction = directionRS1 or direction = directionRS2 or direction = directionLS1 or direction = directionLS2 then
+		PlayerStairs()
+		if direction = directionRS1 or direction = directionLS1 then
+			sprite1="\A"
+			sprite2="\B"
+		end if
+		if direction = directionRS2 or direction = directionLS2 then
+			sprite1="\C"
+			sprite2="\D"
+		end if
+		print at y,x; sprite1
+		print at y+1,x; sprite2
+		if frame=2 then StepSound()
+		if frame=3 then StepSound2()
+	end if
+
+	if direction = directionLX or direction = directionRX then
+		if frame=5 then
+			RedrawArea1(x,y)
+			RedrawArea1(x+1,y)
+			RedrawArea1(x-1,y)
+		end if
+		if frame=1 then
+			RedrawArea1(x+2,y)
+			RedrawArea1(x+2,y-1)
+			RedrawArea1(x-1,y)
+			RedrawArea1(x-1,y+1)
+		end if 
+	end if
+	
+	if direction = directionLX or direction = directionRX then 
+		if direction = directionRX then x = x + 3
+		RedrawArea1(x-1,y)
+		RedrawArea1(x-1,y+1)
+	end if 
+	
+	if direction = directionR or direction = directionL then
+		if frame = 1 then
+			if direction = directionL then x = x + 2
+			RedrawArea1(x-1,y)
+			RedrawArea1(x-1,y+1)
+		end if
+	end if
+	
+	if direction = directionRS or direction = directionLS then
+		RedrawArea1(x-1,y)
+		RedrawArea1(x-1,y+1)
+		RedrawArea1(x+1,y)
+		RedrawArea1(x+1,y+1)
+	end if
+	
+	if direction = directionRD or direction = directionLD then
+		RedrawArea1(x+1,y+1)
+		RedrawArea1(x+1,y)
+		RedrawArea1(x-1,y+1)
+		RedrawArea1(x-1,y)
+	end if
+	
+	if direction = directionRF or direction = directionLF then
+		if direction = directionLF then x = x + 2
+		if frame=4 then
+			RedrawArea1(x-1,y)
+			RedrawArea1(x-1,y+1)
+		end if
+	end if	
+	
+	if direction = directionRS1 or direction = directionRS2 or direction = directionLS1 or direction = directionLS2 then
+		if direction = directionLS1 or direction = directionLS2 then x = x + 2
+		RedrawArea1(x-1,y)
+		RedrawArea1(x-1,y+1)
+	end if
+End sub

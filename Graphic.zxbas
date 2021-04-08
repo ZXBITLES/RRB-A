@@ -1,0 +1,228 @@
+﻿SUB PlayerStaticRight()
+    POKE UINTEGER 23675, @playerStaticRight
+    RETURN
+    playerStaticRight:
+    ASM
+    DEFB 0,28,26,110,214,186,240,108        ; A - Stand Right Part1  12
+    DEFB 126,39,106,104,204,204,204,206     ; B - Stand Right Part3
+
+    DEFB 0,0,0,0,0,014,013,055              ; C - Sit Right Part1  12
+    DEFB 107,093,110,055,057,214,254,183    ; D - Sit Right Part3
+
+    DEFB 0,028,026,110,210,221,231,120      ; E - Stand Right Fire Part1  12
+    DEFB 0,0,0,0,240,240,64,32              ; F - Stand Right Fire Part2  3
+    DEFB 112,056,108,108,200,204,204,206    ; G - Stand Right Fire Part3
+
+    DEFB 0,0,24,0,240,240,64,32             ; H - Stand Right Fire 2
+
+    DEFB 0,0,0,0,240,246,64,32              ; I - Stand Right Fire 3
+
+    DEFB 0,0,0,0,240,240,64,38              ; J - Stand Right Fire 4
+
+    DEFB 0,024,0,0,0,0,0,0                  ; K - Stand Right Fire 5
+
+    ;DEFB 0,0,0,0,024,0,0,0                 ; L - Stand Right Fire 6
+	END ASM
+END SUB
+
+SUB PlayerStaticLeft()
+    POKE UINTEGER 23675, @playerStaticLeft
+    RETURN
+    playerStaticLeft:
+    ASM
+    DEFB 0,56,88,118,107,93,15,54           ; A - Stand Left Part2  12
+    DEFB 126,228,86,22,51,51,51,115         ; B - Stand Left Part4  34
+
+    DEFB 0,0,0,0,0,0,0,0                    ; C - Sit Left Part1  12
+    DEFB 0,0,0,0,0,112,176,236              ; D - Sit Left Part2  34
+    DEFB 0,0,0,0,0,0,0,0                    ; E - Sit Left Part3
+    DEFB 214,186,118,236,156,107,127,237    ; F - Sit Left Part4
+
+    DEFB 0,0,0,0,15,15,2,4                  ; G - Fire Left Part1  12
+    DEFB 0,056,088,118,075,187,231,030      ; H - Fire Left Part2  34
+    DEFB 014,028,054,054,019,051,051,115    ; I - Fire Left Part4
+
+    DEFB 0,0,24,0,15,15,2,4                 ; J - Stand Left Fire 2
+
+    DEFB 0,0,0,0,15,111,2,4                 ; K - Stand Left Fire 3
+
+    DEFB 0,0,0,0,15,15,2,100                ; L - Stand Left Fire 4
+
+    DEFB 0,024,0,0,0,0,0,0                  ; M - Stand Left Fire 5
+
+    ;DEFB 0,0,0,0,024,0,0,0                 ; N - Stand Left Fire 6
+
+    END ASM
+END SUB
+
+SUB PlayerWalkRight()
+    POKE UINTEGER 23675, @playerWalkRight
+    RETURN
+    playerWalkRight:
+    ASM
+    DEFB 0,14,13,55,107,93,108,54           ; A - Walk Right Part1 12
+    DEFB 0,0,0,0,0,0,0,0                    ; B - Walk Right Part2 34
+    DEFB 123,220,30,62,54,99,195,227        ; C - Walk Right Part3
+    DEFB 0,0,0,0,0,0,0,128                  ; D - Walk Right Part4
+
+    DEFB 0,7,6,27,53,46,55,23               ; E - Walk Right Part1 12
+    DEFB 0,0,128,128,128,128,0,0            ; F - Walk Right Part2 34
+    DEFB 26,10,13,15,27,59,99,51            ; G - Walk Right Part3
+    DEFB 0,0,0,0,0,0,0,128                  ; H - Walk Right Part4
+
+    DEFB 0,3,3,13,26,23,22,14               ; I - Walk Right Part1 12
+    DEFB 0,128,64,192,192,64,128,128        ; J - Walk Right Part2 34
+    DEFB 13,27,23,7,15,30,14,7              ; K - Walk Right Part3
+    DEFB 0,0,128,128,0,0,0,0                ; L - Walk Right Part4
+
+    DEFB 0,0,0,3,6,5,5,2                    ; M - Walk Right Part1 12
+    DEFB 0,224,208,112,176,208,224,192      ; N - Walk Right Part2 34
+    DEFB 3,3,1,1,1,3,6,7                    ; O - Walk Right Part3
+    DEFB 96,96,128,224,240,48,28,24         ; P - Walk Right Part4
+
+    DEFB 0,0,0,0,1,1,1,0                    ; Q - Walk Right Part1 12
+    DEFB 0,56,52,220,172,116,176,216        ; R - Walk Right Part2 34
+    DEFB 1,3,0,0,0,1,3,3                    ; S - Walk Right Part3
+    DEFB 236,112,120,248,216,140,12,142     ; T - Walk Right Part4
+    END ASM
+END SUB
+
+SUB PlayerWalkLeft()
+    POKE UINTEGER 23675, @playerWalkLeft
+    RETURN
+    playerWalkLeft:
+    ASM
+    DEFB 0,0,0,0,0,0,0,0                    ; A - Walk Left Part1 12
+    DEFB 0,112,176,236,214,186,54,108       ; B - Walk Left Part2 34
+    DEFB 0,0,0,0,0,0,0,1                    ; C - Walk Left Part3
+    DEFB 222,59,120,124,108,198,195,199     ; D - Walk Left Part4
+
+    DEFB 0,0,1,1,1,1,0,0                    ; E - Walk Left Part1 12
+    DEFB 0,224,96,216,172,116,236,232       ; F - Walk Left Part2 34
+    DEFB 0,0,0,0,0,0,0,1                    ; G - Walk Left Part3
+    DEFB 88,80,176,240,216,220,198,204      ; H - Walk Left Part4
+
+    DEFB 0,1,2,3,3,2,1,1                    ; I - Walk Left Part1 12
+    DEFB 0,192,192,176,88,232,104,112       ; J - Walk Left Part2 34
+    DEFB 0,0,1,1,0,0,0,0                    ; K - Walk Left Part3
+    DEFB 176,216,232,224,240,120,112,224    ; L - Walk Left Part4
+
+    DEFB 0,7,11,14,13,11,7,3                ; M - Walk Left Part1 12
+    DEFB 0,0,0,192,96,160,160,64            ; N - Walk Left Part2 34
+    DEFB 6,6,1,7,15,12,56,24                ; O - Walk Left Part3
+    DEFB 192,192,128,128,128,192,96,224     ; P - Walk Left Part4
+
+    DEFB 0,28,44,59,53,46,13,27             ; Q - Walk Left Part1 12
+    DEFB 0,0,0,0,128,128,128,0              ; R - Walk Left Part2 34
+    DEFB 55,14,30,31,27,49,48,113           ; S - Walk Left Part3
+    DEFB 128,192,0,0,0,128,192,192          ; T - Walk Left Part4
+    END ASM
+END SUB
+
+SUB PlayerFallingLeft()
+    POKE UINTEGER 23675, @playerFallingLeft
+    RETURN
+    playerFallingLeft:
+    ASM
+    DEFB 0,0,0,0,0,0,0,0 ; A - Falling Left Part1 12
+    DEFB 0,28,44,58,53,47,221,122        ; B - Falling Left Part2 34
+    DEFB 0,0,0,0,0,0,0,0 ; C - Falling Left Part3
+    DEFB 46,28,54,54,19,51,51,115        ; D - Falling Left Part4
+
+    DEFB 0,0,0,0,0,0,001,0 ; E - Falling Left Part1 12
+    DEFB 0,0,056,088,118,107,093,187 ; F - Falling Left Part2 34
+    DEFB 0,0,0,001,005,003,001,0 ; G - Falling Left Part3
+    DEFB 246,108,240,176,176,176,048,096 ; H - Falling Left Part4
+
+    DEFB 0,0,0,0,0,006,007,003 ; I - Falling Left Part1 12
+    DEFB 0,0,0,0,056,088,118,139 ; J - Falling Left Part2 34
+    DEFB 065,119,127,004,001,011,014,006 ; K - Falling Left Part3
+    DEFB 125,131,254,248,192,128,0,0 ; L - Falling Left Part4
+
+    DEFB 0,0,0,0,0,0,0,016 ; M - Falling Left Part1 12
+    DEFB 0,0,0,0,0,0,0,192 ; N - Falling Left Part2 34
+    DEFB 028,030,070,115,127,015,003,0 ; O - Falling Left Part3
+    DEFB 192,110,117,183,219,220,104,0 ; P - Falling Left Part4
+
+    DEFB 0,0,0,0,0,128,231,255 ; Q - Falling Left Part1 12
+    DEFB 0,0,0,0,030,237,247,251 ; R - Falling Left Part2 34
+    END ASM
+END SUB
+
+SUB PlayerFallingRight()
+    POKE UINTEGER 23675, @playerFallingRight
+    RETURN
+    playerFallingRight:
+    ASM
+    DEFB 0,56,52,92,172,244,187,94       ; A - Falling Right Part1 12
+    DEFB 0,0,0,0,0,0,0,0 ; B - Falling Right Part2 34
+    DEFB 116,56,108,108,200,204,204,206  ; C - Falling Right Part3
+    DEFB 0,0,0,0,0,0,0,0                 ; D - Falling Right Part4
+
+    DEFB 0,0,028,026,110,214,186,221 ; E - Falling Right Part1 12
+    DEFB 0,0,0,0,0,0,0,128 ; F - Falling Right Part2 34
+    DEFB 111,054,015,013,013,013,012,006 ; G - Falling Right Part3
+    DEFB 0,0,0,128,160,192,128,0 ; H - Falling Right Part4
+
+    DEFB 0,0,0,0,028,026,110,209 ; I - Falling Right Part1 12
+    DEFB 0,0,0,0,0,096,224,192 ; J - Falling Right Part2 34
+    DEFB 190,193,127,031,003,001,0,0 ; K - Falling Right Part3
+    DEFB 130,238,254,032,128,208,112,096 ; L - Falling Right Part4
+
+    DEFB 0,0,0,0,0,0,0,003 ; M - Falling Right Part1 12
+    DEFB 0,0,0,0,0,0,0,008 ; N - Falling Right Part2 34
+    DEFB 003,118,174,237,219,059,022,0 ; O - Falling Right Part3
+    DEFB 056,120,098,206,254,240,192,0 ; P - Falling Right Part4
+
+    DEFB 0,0,0,0,120,183,239,223 ; Q - Falling Right Part1 12
+    DEFB 0,0,0,0,0,001,231,255 ; R - Falling Right Part2 34
+    END ASM
+END SUB
+
+SUB PlayerStairs()
+    POKE UINTEGER 23675, @playerStairs
+    RETURN
+    playerStairs:
+    ASM
+    DEFB 192,216,188,188,195,255,126,60 ; A - Stairs1 Part1
+    DEFB 024,124,230,198,102,230,006,007 ; B - Stairs1 Part2
+    DEFB 3,27,61,61,195,255,126,60 ; C - Stairs2 Part1
+    DEFB 024,062,103,099,102,103,096,224 ; D - Stairs2 Part2
+    END ASM
+END SUB
+
+sub PlayerKick()
+	POKE UINTEGER 23675, @playerKick
+    RETURN
+    playerKick:
+	asm
+		DEFB 24,28,14,6,2,185,255,255 ; Left kick
+		DEFB 112,176,232,220,174,118,227,195
+		DEFB 224,112,56,56,24,56,48,56
+		
+		DEFB 14,13,23,59,117,110,199,195 ; Right kick
+		DEFB 24,56,112,96,64,157,255,255
+		DEFB 7,14,28,28,24,28,12,28
+		
+		DEFB 0,0,24,30,14,3,1,1 ; Left kick 2
+		DEFB 3,7,14,7,3,3,2,0
+		
+		DEFB 0,0,24,120,112,192,128,128 ; Right kick 2
+		DEFB 192,224,112,224,192,192,64,0
+	end asm
+end sub 
+
+sub DeathInLava()
+	POKE UINTEGER 23675, @deathInLava
+    RETURN
+    deathInLava:
+	asm
+		DEFB 0,8,161,4,72,42,189,126
+	DEFB 0,0,8,161,4,72,61,126
+	DEFB 0,0,0,8,129,36,16,106
+	DEFB 0,0,0,0,8,129,32,8
+	DEFB 0,0,0,0,0,8,129,32
+	DEFB 0,0,0,0,0,0,0,137
+	end asm
+end sub 
+

@@ -1,0 +1,511 @@
+﻿#include "Functions.zxbas"
+#include "PlayerAndNPC.zxbas"
+#include "Music.zxbas"
+
+PlayMusic(0)
+pause 0
+BORDER 0 : PAPER 0 : INK 7 : BRIGHT 0
+CLS
+ 
+
+dim currentMap as ubyte
+
+const key1 as uinteger = 63233
+const key2 as uinteger = 63234
+const key3 as uinteger = 63236
+const key4 as uinteger = 63240
+const key5 as uinteger = 63248
+const keybreak as uinteger = 65025
+const keyr as uinteger = 64264
+
+dim defkeyindex as ubyte = 0
+dim gameDifficulty as ubyte = 1
+dim joystick as ubyte = 1
+
+keyLeft = key1
+keyRight = key2
+keyUp = key4
+keyDown = key3
+keyFire = key5
+
+'Menu
+drawmenu:
+ink 6
+Environment2()
+print at 6,11; "\D\E"
+print at 7,11; "\F\G"
+
+ink 2
+print at 6,13; bold 1; "RED RAID"
+ink 4
+printat64(7,26): print64("THE BEGINNING...")
+ink 7
+printat64(8,29): print64("SIDE A")
+
+ink 5
+printat64(10,26): print64("1 NEW GAME")
+UpdateJoystik(joystick)
+printat64(12,26): print64("3 DEFINE KEYS")
+UpdateDiff(gameDifficulty)
+PrintCompany()
+LongWait()
+PlayMusic(0)
+
+dim b as uinteger
+
+:mainmenu
+	ink 5
+	b =  GetKeyScanCode
+	if b = key1 then Click(): CLS: goto start
+	if b = key2 then
+		joystick = joystick+1
+		if joystick>2 then joystick = 1
+		if joystick=1 then
+			keyLeft = key1
+			keyRight = key2
+			keyUp = key4
+			keyDown = key3
+			keyFire = key5
+		end if
+		if joystick=2 then
+			keyLeft = 57090
+			keyRight = 57089
+			keyUp = 64257
+			keyDown = 64769
+			keyFire = 32513
+		end if
+		UpdateJoystik(joystick)
+		Click()
+		LongWait()
+		b = 0
+	end if
+	if b = key3 then
+		Click()
+		CLS
+		joystick=2
+		ink 2
+		print at 6,11; bold 1; "DEFINE KEYS"
+		PrintCompany()
+		ink 5
+		defkeyindex = 0
+		keys:
+			if defkeyindex = 0 then printat64(9,24): print64("LEFT")
+			if defkeyindex = 1 then printat64(10,24): print64("RIGHT")
+			if defkeyindex = 2 then printat64(11,24): print64("UP")
+			if defkeyindex = 3 then printat64(12,24): print64("DOWN/SEARCH")
+			if defkeyindex = 4 then printat64(13,24): print64("FIRE/USE")
+			b =  GetKeyScanCode
+			if b<>0 then
+				if defkeyindex = 0 then keyLeft = b
+				if defkeyindex = 1 then keyRight = b
+				if defkeyindex = 2 then keyUp = b
+				if defkeyindex = 3 then keyDown = b
+				if defkeyindex = 4 then keyFire = b
+				printat64(9 + defkeyindex,40)
+				print64("OK")
+				defkeyindex = defkeyindex + 1
+				b=0
+				Click()
+				LongWait()
+				pause 2
+				if defkeyindex = 5 then CLS: goto drawmenu
+				goto keys
+			end if
+		goto keys:
+	end if
+	if b = key4 then
+		gameDifficulty = gameDifficulty+1
+		if gameDifficulty>3 then gameDifficulty = 1
+		UpdateDiff(gameDifficulty)
+		Click()
+		LongWait()
+		b = 0
+	end if
+goto mainmenu
+
+:start
+playerLives  = 3
+playerAmmo = 10
+playerShield = 10
+playerDead = 0
+playerFrags = 0
+
+SetDifficulty(gameDifficulty)
+currentMap = 1
+DrawLevel(currentMap,0)
+
+RespawnPlayer()
+
+dim action as ubyte
+dim i as ubyte
+dim deltaX as ubyte
+dim deltaY as ubyte
+dim countLive as ubyte
+dim hitcalculated as ubyte
+Randomize
+:main
+	dim playerCanMoveLeft as ubyte
+	dim playerCanMoveRight as ubyte
+
+	dim nx as ubyte
+	dim ny as ubyte
+	dim nframe as ubyte
+	dim ndir as ubyte
+	dim nlive as ubyte
+	dim nactive as ubyte
+	dim nmove as ubyte
+	dim npcaction as ubyte
+	dim nhp as ubyte
+
+	playerCanMoveLeft = 1
+	playerCanMoveRight = 1
+
+	countLive = 0
+	hitcalculated = 0
+		
+	for i = 0 to 5
+		nlive = npcLive(i)
+		npcaction = actionEmpty
+		nx = npcX(i)
+		ny = npcY(i)
+		nframe = npcFrame(i)
+		ndir = npcDirection(i)			
+		nactive = npcActive(i)
+		nmove = npcMove(i)
+		nhp = npcHP(i)
+		if nlive = 1 then
+			countLive = countLive + 1			
+			if playerY > ny then
+				deltaY = playerY - ny
+			else
+				deltaY = ny - playerY
+			end if
+			if playerX > nx then
+				deltaX = playerX - nx
+			else
+				deltaX = nx - playerX
+			end if
+			if nactive = 0 then
+				if playerY = ny then npcActive(i) = 1: nactive = 1
+			end if
+			if nactive = 1 then
+				if deltaY > 0 and npcWorried(i) > 0 then
+					nframe = 1
+					if nmove=1 then ClearBeforeDeathInLava(nx,ny,1)
+					nmove = 0
+					if ndir = directionLF or ndir = directionLK or ndir = directionL then ndir = directionLD
+					if ndir = directionRF or ndir = directionRK or ndir = directionR then ndir = directionRD
+					npcaction = actionD
+					npcActive(i) = 0
+					nactive = 0
+					goto skipnpc
+				end if
+			end if
+			if NPCCanFall(nx, ny, nlive) = 1 then
+				npcActive(i) = 1
+				nactive = 1
+				npcaction = actionD
+				goto skipnpc
+			end if
+			if nlive = 1 and nhp = 0 and (ndir <> directionRX and ndir <> directionLX) then
+				nmove = 0
+				nframe = 1
+				if ndir = directionRS or ndir = directionR or ndir = directionRF or ndir = directionRD or ndir = directionRK then
+					npcDirection(i) = directionRX
+					ndir = directionRX
+				end if
+				if ndir = directionLS or ndir = directionL or ndir = directionLF or ndir = directionLD or ndir = directionLK then
+					npcDirection(i) = directionLX
+					ndir = directionLX
+					nx=nx-1
+				end if
+				npcaction = actionX
+				goto skipnpc
+			end if
+			if nactive = 1 or (nhp=0 and nlive=1) then
+				if nlive = 1 and nhp = 0 and (ndir = directionLX or ndir = directionRX) then
+					if NPCCanFall(nx, ny, 0) = 0 then
+						PlayerOrNPCAction(nx, ny, ndir, actionX, nmove, nframe, 2, i+1)
+						if nframe = 5 then
+							npcLive(i) = 0
+							nlive = 0
+							playerFrags = playerFrags +1
+							RefreshUI()
+						end if
+						goto skipnpc
+					else
+						npcaction = actionX
+						goto skipnpc
+					end if
+				end if
+				if nlive = 1 and nhp > 0 then
+					if playerY = ny and playerShield > 0 then
+						dim canHit as ubyte = 1
+						if playerX > nx then canHit = CanHit(nx,playerY,playerX)
+						if playerX < nx then canHit = CanHit(playerX,playerY,nx)
+						hitcalculated=hitcalculated+1
+						if canHit = 1 then
+							if ndir <> directionRF and ndir <> directionLF and ndir <> directionLK and ndir <> directionRK then
+								npcWorried(i) = 1
+								if npcDuration(i) = 0 then
+									if nx < playerX then ndir = directionRS
+									if nx > playerX then ndir = directionLS
+									npcDuration(i) = 5
+									npcaction = actionEmpty
+									dim act as ubyte = RND*7
+									if act <= 2 and nmove = 0 then
+										if nx < playerX then ndir = directionRD
+										if nx > playerX then ndir = directionLD
+										nframe = 1
+										npcDuration(i) = 5
+									end if
+									if act = 3 or act = 6 then
+										if nx < playerX then ndir = directionRS
+										if nx > playerX then ndir = directionLS
+										npcaction = actionF
+										nmove = 0
+										nframe = 1
+										goto skipnpc
+									end if
+									if playerMove = 0  and (action <> actionL and action <> actionR) then
+										if act = 4 then
+											if nx + 2 < playerX and playerMove = 0 then
+												if NPCCanMoveRight(nx, ny) = 1 then
+													npcaction = actionR
+													goto skipnpc
+												end if
+											end if
+										end if
+										if act = 5 then
+											if nx - 2 > playerX and playerMove = 0 then
+												if NPCCanMoveLeft(nx, ny) = 1 then
+													npcaction = actionL
+													goto skipnpc
+												end if
+											end if
+										end if
+									end if
+								end if
+							end if
+							goto skipnpc
+						end if
+					else
+						if npcWorried(i) = 1 then
+							npcWorried(i) = 2
+							npcFrame(i) = 1
+						end if
+					end if
+				end if
+				goto skipnpc2
+				:skipnpc
+				if playerY = ny and nhp > 0 then
+					if nx - playerX = 1 or playerX - nx = 1 then
+						if NPCCanMoveLeft(nx-1, ny) = 1 then nx = nx - 1
+						if NPCCanMoveRight(nx-1, ny) = 1 then nx = nx + 1
+					end if
+					if nx = playerX then
+						if NPCCanMoveLeft(nx, ny) = 1 then nx = nx - 1
+						if NPCCanMoveRight(nx, ny) = 1 then nx = nx + 1
+					end if
+				end if
+				PlayerOrNPCAction(nx, ny, ndir, npcaction, nmove, nframe, 2, i+1)
+				:skipnpc2
+				npcFrame(i) = npcFrame(i)+1
+				if npcFrame(i) > 5 then npcFrame(i) = 1
+				if npcDuration(i)>0 then npcDuration(i) = npcDuration(i) - 1
+			end if
+			
+			'Check if player can move
+			if playerY = ny then
+				if nx+2 = playerX then
+					playerCanMoveLeft = 0
+				end if
+				if nx-2 = playerX then
+					playerCanMoveRight = 0
+				end if
+			end if
+		end if
+	next i
+
+	'Move player
+    action = actionEmpty
+	if playerShield > 0 then
+		if MultiKeys(keybreak)>0 then
+			ink 6
+			flash 1
+			printat64(21,9): print64(" PRESS FIRE TO QUIT THE GAME OR R TO RESTART ")
+			Click()
+			:pausegame2
+			b = GetKeyScanCode()
+			if b > 0 then 
+				flash 0
+				if b = keyFire then
+					cls
+					goto drawmenu
+				else		
+					if b = keyr then
+						RestartLevel()
+						RespawnPlayer()
+						goto main
+					end if 		
+					ClearStatusLine()
+					goto continuegame3
+				end if 
+			end if 
+			goto pausegame2
+			:continuegame3
+		end if 
+		if MultiKeys(keyRight)>0 then
+			playerStairsDelay = 0
+			if playerDirection = directionLS or playerDirection = directionLD then
+				playerDirection = directionRS
+				action = actionEmpty
+			else
+				if playerCanMoveRight = 1 then
+					action = actionR
+				else
+					playerDirection = directionRS
+					action = actionEmpty
+				end if
+			end if
+		end if
+		if MultiKeys(keyLeft)>0 then
+			playerStairsDelay = 0
+			if playerDirection = directionRS or playerDirection = directionRD then
+				playerDirection = directionLS
+				action = actionEmpty
+			else
+				if playerCanMoveLeft = 1 then
+					action = actionL
+				else
+					playerDirection = directionLS
+					action = actionEmpty
+				end if
+			end if
+		end if
+		if playerDirection<>directionLK and playerDirection<>directionRK then
+			if MultiKeys(keyUp)>0 then action = actionU
+			if MultiKeys(keyDown)>0 then action = actionD
+			if MultiKeys(keyFire)>0 then action = actionF: playerStairsDelay = 0
+		end if 	
+		if playerMove = 0 and (playerDirection = directionRS or playerDirection = directionLS or playerDirection = directionRD or playerDirection = directionLD) then playerFrame = 1
+	end if
+	if playerShield = 0 and playerDead = 0 and playerDirection <> directionRX and playerDirection <> directionLX then
+		playerFrame = 1
+		playerMove = 0
+		if playerDirection = directionRS or playerDirection = directionRF or playerDirection = directionR or playerDirection = directionRD or playerDirection = directionRS1 or playerDirection = directionRS2 or playerDirection = directionRK then
+			playerDirection = directionRX
+		end if
+		if playerDirection = directionLS or playerDirection = directionLF or playerDirection = directionL or playerDirection = directionLD or playerDirection = directionLS1 or playerDirection = directionLS2 or playerDirection = directionLK then
+			playerDirection = directionLX
+		end if
+	end if
+	
+	dim redrawplayer as ubyte = 0
+	if playerShield = 0 and (playerDirection = directionRX or playerDirection = directionLX) then
+		action = actionX
+		redrawplayer = 1
+	end if
+	if playerShield > 0 then
+		redrawplayer = 1
+	end if
+	if redrawplayer = 1 then
+		PlayerOrNPCAction(playerX, playerY, playerDirection, action, playerMove, playerFrame, 7, 0)
+	end if
+
+
+	'Player is dead
+	if playerShield = 0 and playerFrame < 5 and playerDead = 0 then
+		playerFrame = playerFrame + 1
+	end if
+	if playerShield > 0 then
+		playerFrame = playerFrame + 1
+		if playerFrame > 5 then playerFrame = 1
+	end if
+
+	if playerDead = 1 and playerLives = 0 then
+		RefreshNPCs()
+		PlayMusic(1)
+		paper 0
+		cls
+		print at 10,11; ink 4; "GAME OVER"
+		:gameover
+		if MultiKeys(keyFire)>0 then
+			Click()
+			CLS: goto drawmenu
+		end if 
+		goto gameover		
+	end if
+
+	if playerDead = 1 and playerLives > 0 then
+		RefreshNPCs()
+		playerLives = playerLives - 1
+		playerShield = 10
+		playerAmmo = 10
+		PlayMusic(1)
+		DrawLevel(mapNumber,0)
+		RespawnPlayer()
+	end if
+
+	if hitcalculated = 0 and countLive > 0 then
+		Wait()
+	end if 
+	if countLive = 0 then 
+		Wait()
+		Wait()
+	else
+		Wait()
+	end if
+
+goto main
+
+sub Wait()
+	asm
+		HALT
+	end asm
+end sub 
+
+sub LongWait()
+	Wait()
+	Wait()
+	Wait()
+end sub 
+
+sub UpdateDiff(diff as ubyte)
+	printat64(13,26)
+	if diff=1 then
+		print64("4 EASY")
+	end if
+	if diff=2 then
+		print64("4 NORMAL")
+	end if
+	if diff=3 then
+		print64("4 HARD  ")
+	end if
+end sub
+
+sub UpdateJoystik(joy as ubyte)
+	printat64(11,26)
+	if joy=1 then
+		print64("2 SINCLAIR")
+	end if
+	if joy=2 then
+		print64("2 KEYBOARD")
+	end if
+end sub
+
+sub PrintCompany()
+	ink 4
+	print at 17,13; "\P"
+	print at 18,13; "\R"
+	printat64(18,30): print64("BITLES")
+	plot 130,40 
+	plot 130,39
+	print at 17,16; "\T"
+	ink 1
+	bright 1
+
+	print at 17,14; "\Q"
+	print at 18,14; "\S"
+	bright 0
+end sub
